@@ -107,6 +107,10 @@
       <HintPath>..\packages\Microsoft.VisualStudio.Validation.14.1.111\lib\net45\Microsoft.VisualStudio.Validation.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="Newtonsoft.Json, Version=6.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\packages\Newtonsoft.Json.6.0.8\lib\net45\Newtonsoft.Json.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Data" />
@@ -215,35 +219,35 @@
       <Link>Packages\Microsoft.Orleans.Server.1.1.0.nupkg</Link>
       <IncludeInVSIX>true</IncludeInVSIX>
     </Content>
-    <Content Include="..\..\packages\Microsoft.CodeAnalysis.Analyzers.1.0.0\Microsoft.CodeAnalysis.Analyzers.1.0.0.nupkg">
+    <Content Include="..\packages\Microsoft.CodeAnalysis.Analyzers.1.0.0\Microsoft.CodeAnalysis.Analyzers.1.0.0.nupkg">
       <Link>Packages\Microsoft.CodeAnalysis.Analyzers.1.0.0.nupkg</Link>
       <IncludeInVSIX>true</IncludeInVSIX>
     </Content>
-    <Content Include="..\..\packages\Microsoft.CodeAnalysis.Common.1.0.0\Microsoft.CodeAnalysis.Common.1.0.0.nupkg">
+    <Content Include="..\packages\Microsoft.CodeAnalysis.Common.1.0.0\Microsoft.CodeAnalysis.Common.1.0.0.nupkg">
       <Link>Packages\Microsoft.CodeAnalysis.Common.1.0.0.nupkg</Link>
       <IncludeInVSIX>true</IncludeInVSIX>
     </Content>
-    <Content Include="..\..\packages\Microsoft.CodeAnalysis.CSharp.1.0.0\Microsoft.CodeAnalysis.CSharp.1.0.0.nupkg">
+    <Content Include="..\packages\Microsoft.CodeAnalysis.CSharp.1.0.0\Microsoft.CodeAnalysis.CSharp.1.0.0.nupkg">
       <Link>Packages\Microsoft.CodeAnalysis.CSharp.1.0.0.nupkg</Link>
       <IncludeInVSIX>true</IncludeInVSIX>
     </Content>
-    <Content Include="..\..\packages\Microsoft.Extensions.DependencyInjection.1.0.0-rc1-final\Microsoft.Extensions.DependencyInjection.1.0.0-rc1-final.nupkg">
+    <Content Include="..\packages\Microsoft.Extensions.DependencyInjection.1.0.0-rc1-final\Microsoft.Extensions.DependencyInjection.1.0.0-rc1-final.nupkg">
       <Link>Packages\Microsoft.Extensions.DependencyInjection.1.0.0-rc1-final.nupkg</Link>
       <IncludeInVSIX>true</IncludeInVSIX>
     </Content>
-    <Content Include="..\..\packages\Microsoft.Extensions.DependencyInjection.Abstractions.1.0.0-rc1-final\Microsoft.Extensions.DependencyInjection.Abstractions.1.0.0-rc1-final.nupkg">
+    <Content Include="..\packages\Microsoft.Extensions.DependencyInjection.Abstractions.1.0.0-rc1-final\Microsoft.Extensions.DependencyInjection.Abstractions.1.0.0-rc1-final.nupkg">
       <Link>Packages\Microsoft.Extensions.DependencyInjection.Abstractions.1.0.0-rc1-final.nupkg</Link>
       <IncludeInVSIX>true</IncludeInVSIX>
     </Content>
-    <Content Include="..\..\packages\Newtonsoft.Json.6.0.8\Newtonsoft.Json.6.0.8.nupkg">
+    <Content Include="..\packages\Newtonsoft.Json.6.0.8\Newtonsoft.Json.6.0.8.nupkg">
       <Link>Packages\Newtonsoft.Json.6.0.8.nupkg</Link>
       <IncludeInVSIX>true</IncludeInVSIX>
     </Content>
-    <Content Include="..\..\packages\System.Collections.Immutable.1.1.36\System.Collections.Immutable.1.1.36.nupkg">
+    <Content Include="..\packages\System.Collections.Immutable.1.1.36\System.Collections.Immutable.1.1.36.nupkg">
       <Link>Packages\System.Collections.Immutable.1.1.36.nupkg</Link>
       <IncludeInVSIX>true</IncludeInVSIX>
     </Content>
-    <Content Include="..\..\packages\System.Reflection.Metadata.1.0.21\System.Reflection.Metadata.1.0.21.nupkg">
+    <Content Include="..\packages\System.Reflection.Metadata.1.0.21\System.Reflection.Metadata.1.0.21.nupkg">
       <Link>Packages\System.Reflection.Metadata.1.0.21.nupkg</Link>
       <IncludeInVSIX>true</IncludeInVSIX>
     </Content>
@@ -359,6 +363,10 @@
       <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
       <IncludeOutputGroupsInVSIX>TemplateProjectOutputGroup%3b</IncludeOutputGroupsInVSIX>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Analyzer Include="..\packages\Microsoft.CodeAnalysis.Analyzers.1.0.0\analyzers\dotnet\cs\Microsoft.CodeAnalysis.Analyzers.dll" />
+    <Analyzer Include="..\packages\Microsoft.CodeAnalysis.Analyzers.1.0.0\analyzers\dotnet\cs\Microsoft.CodeAnalysis.CSharp.Analyzers.dll" />
   </ItemGroup>
   <PropertyGroup>
     <UseCodebase>true</UseCodebase>
