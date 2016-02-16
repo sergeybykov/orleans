@@ -55,9 +55,11 @@ if "%BuildOrleansNuGet%" == "false" (
 @if ERRORLEVEL 1 GOTO :ErrorStop
 @echo BUILD ok for VSIX package for %PROJ%
 
-if not exist "%OutDir%\VSIX" md "%OutDir%\VSIX"
-@echo moving "%OutDir%\OrleansVSTools.*" to "%OutDir%\VSIX\"
-move /y "%OutDir%\OrleansVSTools.*" "%OutDir%\VSIX\"
+set VSIX_DIR=%CMDHOME%\..\Binaries\VSIX
+
+if not exist "%VSIX_DIR%" md "%VSIX_DIR%"
+@echo moving "%OutDir%\OrleansVSTools.*" to "%VSIX_DIR%\"
+move /y "%OutDir%\OrleansVSTools.*" "%VSIX_DIR%\" 
 
 @echo ===== Build succeeded for %PROJ% =====
 @GOTO :EOF
