@@ -38,7 +38,8 @@ namespace Orleans
         private readonly StatisticsProviderManager statisticsProviderManager;
 
         internal ClientStatisticsManager ClientStatistics;
-        private readonly GrainId clientId;
+        private GrainId clientId;
+        private readonly GrainId handshakeClientId;
         private IGrainTypeResolver grainInterfaceMap;
         private readonly ThreadTrackingStatistic incomingMessagesThreadTimeTracking;
 
@@ -135,7 +136,7 @@ namespace Orleans
             appLogger = LogManager.GetLogger("Application", LoggerType.Application);
 
             BufferPool.InitGlobalBufferPool(config);
-            this.clientId = GrainId.NewClientId(cfg.ClusterId);
+            this.handshakeClientId = GrainId.NewClientId();
 
             try
             {
@@ -170,7 +171,7 @@ namespace Orleans
                 // Client init / sign-on message
                 logger.Info(ErrorCode.ClientInitializing, string.Format(
                     "{0} Initializing OutsideRuntimeClient on {1} at {2} Client Id = {3} {0}",
-                    BARS, config.DNSHostName, localAddress, clientId));
+                    BARS, config.DNSHostName, localAddress, handshakeClientId));
                 string startMsg = string.Format("{0} Starting OutsideRuntimeClient with runtime Version='{1}' in AppDomain={2}", 
                     BARS, RuntimeVersion.Current, PrintAppDomainDetails());
                 startMsg = string.Format("{0} Config= "  + Environment.NewLine + " {1}", startMsg, config);
@@ -186,7 +187,7 @@ namespace Orleans
                 var generation = -SiloAddress.AllocateNewGeneration(); // Client generations are negative
                 var gatewayListProvider = GatewayProviderFactory.CreateGatewayListProvider(config)
                     .WithTimeout(initTimeout).Result;
-                transport = new ProxiedMessageCenter(config, localAddress, generation, clientId, gatewayListProvider);
+                transport = new ProxiedMessageCenter(config, localAddress, generation, handshakeClientId, gatewayListProvider);
 
                 if (StatisticsCollector.CollectThreadTimeTrackingStats)
                 {
@@ -257,7 +258,7 @@ namespace Orleans
             }
             StartInternal();
 
-            logger.Info(ErrorCode.ProxyClient_StartDone, "{0} Started OutsideRuntimeClient with Global Client ID: {1}", BARS, CurrentActivationAddress.ToString() + ", client GUID ID: " + clientId);
+            logger.Info(ErrorCode.ProxyClient_StartDone, "{0} Started OutsideRuntimeClient with Global Client ID: {1}", BARS, CurrentActivationAddress.ToString() + ", client GUID ID: " + handshakeClientId);
               
         }
 
@@ -266,7 +267,7 @@ namespace Orleans
         {
             transport.Start();
             LogManager.MyIPEndPoint = transport.MyAddress.Endpoint; // transport.MyAddress is only set after transport is Started.
-            CurrentActivationAddress = ActivationAddress.NewActivationAddress(transport.MyAddress, clientId);
+            CurrentActivationAddress = ActivationAddress.NewActivationAddress(transport.MyAddress, handshakeClientId);
 
             ClientStatistics = new ClientStatisticsManager(config);
             ClientStatistics.Start(config, statisticsProviderManager, transport, clientId)
@@ -290,6 +291,18 @@ namespace Orleans
                 }
             );
             grainInterfaceMap = transport.GetTypeCodeMap(grainFactory).Result;
+
+            if (!string.IsNullOrEmpty(grainInterfaceMap.ClusterId))
+            {
+                clientId = GrainId.NewClientId(handshakeClientId.PrimaryKey, grainInterfaceMap.ClusterId);
+                transport.UpdateClientId(clientId);
+                CurrentActivationAddress = ActivationAddress.GetAddress(transport.MyAddress, clientId, CurrentActivationAddress.Activation);
+            }
+            else
+            {
+                clientId = handshakeClientId;
+            }
+
             StreamingInitialize();
         }
 

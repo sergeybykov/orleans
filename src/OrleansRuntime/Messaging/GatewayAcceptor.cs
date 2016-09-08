@@ -26,11 +26,22 @@ namespace Orleans.Runtime.Messaging
             if (!ReceiveSocketPreample(sock, true, out client)) return false;
 
             // refuse clients that are connecting to the wrong cluster
-            if (client.Category == UniqueKey.Category.GeoClient
-                && client.Key.ClusterId != Silo.CurrentSilo.ClusterId)
+            if (client.Category == UniqueKey.Category.GeoClient)
             {
-                Log.Error(ErrorCode.GatewayAcceptor_WrongClusterId, string.Format("Refusing connection by client {0} because of cluster id mismatch: client={1} silo={2}", client, client.Key.ClusterId, Silo.CurrentSilo.ClusterId));
-                return false;
+                if(client.Key.ClusterId != Silo.CurrentSilo.ClusterId)
+                {
+                    Log.Error(ErrorCode.GatewayAcceptor_WrongClusterId,
+                        string.Format(
+                            "Refusing connection by client {0} because of cluster id mismatch: client={1} silo={2}",
+                            client, client.Key.ClusterId, Silo.CurrentSilo.ClusterId));
+                    return false;
+                }
+            }
+            else
+            {
+                //convert handshake cliendId to a GeoClient ID 
+                if (!string.IsNullOrEmpty(Silo.CurrentSilo.ClusterId))
+                    client = GrainId.NewClientId(client.PrimaryKey, Silo.CurrentSilo.ClusterId);
             }
 
             gateway.RecordOpenedSocket(sock, client);
