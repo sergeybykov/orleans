@@ -43,7 +43,6 @@ namespace Orleans.Runtime.Messaging
                 if (!string.IsNullOrEmpty(Silo.CurrentSilo.ClusterId))
                 {
                     client = GrainId.NewClientId(client.PrimaryKey, Silo.CurrentSilo.ClusterId);
-                    adjustReturnAddressOnNextMessage = true;
                 }
             }
 
@@ -58,7 +57,6 @@ namespace Orleans.Runtime.Messaging
             gateway.RecordClosedSocket(sock);
         }
 
-        private bool adjustReturnAddressOnNextMessage;
 
         /// <summary>
         /// Handles an incoming (proxied) message by rerouting it immediately and unconditionally,
@@ -78,10 +76,9 @@ namespace Orleans.Runtime.Messaging
             gatewayTrafficCounter.Increment();
 
             // return address translation for geo clients (replace sending address cli/* with gcl/*)
-            if (adjustReturnAddressOnNextMessage)
+            if (! string.IsNullOrEmpty(Silo.CurrentSilo.ClusterId) && msg.SendingAddress.Grain.Category != UniqueKey.Category.GeoClient)
             {
                 msg.SendingGrain = GrainId.NewClientId(msg.SendingAddress.Grain.PrimaryKey, Silo.CurrentSilo.ClusterId);
-                adjustReturnAddressOnNextMessage = false;
             }
 
             // Are we overloaded?
