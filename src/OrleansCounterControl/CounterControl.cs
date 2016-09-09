@@ -173,7 +173,7 @@ namespace Orleans.Counter.Control
                 if (GrainTypeManager.Instance == null)
                 {
                     var loader = new SiloAssemblyLoader(new Dictionary<string, SearchOption>());
-                    var typeManager = new GrainTypeManager(false, null, loader, null); // We shouldn't need GrainFactory in this case
+                    var typeManager = new GrainTypeManager(false, null, loader); // We shouldn't need GrainFactory in this case
                     GrainTypeManager.Instance.Start(false);
                 }
                 // Register perf counters

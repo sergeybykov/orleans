@@ -28,11 +28,11 @@ namespace Orleans.Runtime
             Instance = null;
         }
 
-        public GrainTypeManager(bool localTestMode, IGrainFactory grainFactory, SiloAssemblyLoader loader, string clusterId)
+        public GrainTypeManager(bool localTestMode, IGrainFactory grainFactory, SiloAssemblyLoader loader)
         {
             this.grainFactory = grainFactory;
             this.loader = loader;
-            grainInterfaceMap = new GrainInterfaceMap(localTestMode, clusterId);
+            grainInterfaceMap = new GrainInterfaceMap(localTestMode);
             lock (lockable)
             {
                 if (Instance != null)

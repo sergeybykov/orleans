@@ -13,7 +13,6 @@ namespace Orleans.Runtime
         bool TryGetGrainClassData(string grainImplementationClassName, out GrainClassData implementation);
         bool IsUnordered(int grainTypeCode);
         string GetLoadedGrainAssemblies();
-        string ClusterId { get; }
     }
 
     /// <summary>
@@ -77,7 +76,7 @@ namespace Orleans.Runtime
         private readonly bool localTestMode;
         private readonly HashSet<string> loadedGrainAsemblies;
 
-        public GrainInterfaceMap(bool localTestMode, string clusterId)
+        public GrainInterfaceMap(bool localTestMode)
         {
             table = new Dictionary<int, GrainInterfaceData>();
             typeToInterfaceData = new Dictionary<string, GrainInterfaceData>();
@@ -87,8 +86,6 @@ namespace Orleans.Runtime
             this.localTestMode = localTestMode;
             if(localTestMode) // if we are running in test mode, we'll build a list of loaded grain assemblies to help with troubleshooting deployment issue
                 loadedGrainAsemblies = new HashSet<string>();
-
-            ClusterId = clusterId;
         }
 
         internal void AddEntry(int interfaceId, Type iface, int grainTypeCode, string grainInterface, string grainClass, string assembly, 
@@ -347,7 +344,6 @@ namespace Orleans.Runtime
         {
             return unordered.Contains(grainTypeCode);
         }
-        public string ClusterId { get; private set; }
     }
 
     /// <summary>

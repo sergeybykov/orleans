@@ -238,8 +238,7 @@ namespace Orleans.Runtime
             typeManager = new GrainTypeManager(
                 here.Address.Equals(IPAddress.Loopback),
                 grainFactory, 
-                new SiloAssemblyLoader(OrleansConfig.Defaults.AdditionalAssemblyDirectories),
-                config.Globals.ClusterId);
+                new SiloAssemblyLoader(OrleansConfig.Defaults.AdditionalAssemblyDirectories));
 
             // Performance metrics
             siloStatistics = new SiloStatisticsManager(globalConfig, nodeConfig);
