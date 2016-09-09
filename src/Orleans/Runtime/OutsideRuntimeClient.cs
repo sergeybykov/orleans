@@ -292,19 +292,10 @@ namespace Orleans
             );
             grainInterfaceMap = transport.GetTypeCodeMap(grainFactory).Result;
 
-            if (!string.IsNullOrEmpty(grainInterfaceMap.ClusterId))
-            {
-                clientId = GrainId.NewClientId(handshakeClientId.PrimaryKey, grainInterfaceMap.ClusterId);
-                transport.UpdateClientId(clientId);
-                CurrentActivationAddress = ActivationAddress.GetAddress(transport.MyAddress, clientId, CurrentActivationAddress.Activation);
-            }
-            else
-            {
-                clientId = handshakeClientId;
-            }
-
             StreamingInitialize();
         }
+
+        bool firstMessageReceived;
 
         private void RunClientMessagePump(CancellationToken ct)
         {
@@ -324,6 +315,25 @@ namespace Orleans
                             incomingMessagesThreadTimeTracking.OnStartProcessing();
                         }
 #endif
+
+                // when we receive the first message, we update the
+                // clientId for this client because it may have been modified to 
+                // include the cluster name
+                if (!firstMessageReceived)
+                {
+                    firstMessageReceived = true;
+                    if (!handshakeClientId.Equals(message.TargetGrain))
+                    {
+                        clientId = message.TargetGrain;
+                        transport.UpdateClientId(clientId);
+                        CurrentActivationAddress = ActivationAddress.GetAddress(transport.MyAddress, clientId, CurrentActivationAddress.Activation);
+                    }
+                    else
+                    {
+                        clientId = handshakeClientId;
+                    }
+                }
+
                 switch (message.Direction)
                 {
                     case Message.Directions.Response:
