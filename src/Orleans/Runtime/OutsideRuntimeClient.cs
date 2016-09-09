@@ -33,6 +33,7 @@ namespace Orleans
         private readonly ProxiedMessageCenter transport;
         private bool listenForMessages;
         private CancellationTokenSource listeningCts;
+        private bool firstMessageReceived;
 
         private readonly ClientProviderRuntime clientProviderRuntime;
         private readonly StatisticsProviderManager statisticsProviderManager;
@@ -294,8 +295,6 @@ namespace Orleans
 
             StreamingInitialize();
         }
-
-        bool firstMessageReceived;
 
         private void RunClientMessagePump(CancellationToken ct)
         {
