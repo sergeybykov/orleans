@@ -654,7 +654,7 @@ namespace Orleans.Runtime
                 var serviceType = System.Type.GetType(serviceConfig.Value.ServiceType);
                 if (serviceType == null)
                 {
-                    throw new Exception(String.Format("Cannot find Grain Service type {0} of Grain Service {1}", serviceConfig.Value.ServiceType, serviceConfig.Value.Name));
+                    throw new Exception(String.Format("Cannot find Grain Service type {0}", serviceConfig.Value.ServiceType));
                 }
                 
                 var grainServiceInterfaceType = serviceType.GetInterfaces().FirstOrDefault(x => x.GetInterfaces().Contains(typeof(IGrainService)));

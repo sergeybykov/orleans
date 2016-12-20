@@ -23,7 +23,7 @@ namespace Orleans.Runtime.Configuration
 
             GrainServiceConfiguration.LoadProviderConfigurations(
                 child, nsManager, container.GrainServices,
-                c => container.GrainServices.Add(c.Name, c));
+                c => container.GrainServices.Add(c.ServiceType, c));
 
             return container;
         }
@@ -31,43 +31,32 @@ namespace Orleans.Runtime.Configuration
 
     internal static class GrainServiceConfigurationsUtility
     {
-        internal static void RegisterGrainService(GrainServiceConfigurations grainServicesConfig, string serviceName, string clientType, string serviceType, IDictionary<string, string> properties = null)
+        internal static void RegisterGrainService(GrainServiceConfigurations grainServicesConfig, string serviceType)
         {
-            if (grainServicesConfig.GrainServices.ContainsKey(serviceName))
+            if (grainServicesConfig.GrainServices.ContainsKey(serviceType))
                 throw new InvalidOperationException(
-                    string.Format("Grain service of with name '{0}' has been already registered", serviceName));
+                    string.Format("Grain service of type '{0}' has been already registered", serviceType));
 
-            var config = new GrainServiceConfiguration(
-                properties ?? new Dictionary<string, string>(),
-                serviceName, clientType, serviceType);
+            var config = new GrainServiceConfiguration(serviceType);
 
-            grainServicesConfig.GrainServices.Add(config.Name, config);
+            grainServicesConfig.GrainServices.Add(serviceType, config);
         }
     }
 
     public interface IGrainServiceConfiguration
     {
-        string Name { get; set; }
-        string ClientType { get; set; }
         string ServiceType { get; set; }
     }
 
     [Serializable]
     public class GrainServiceConfiguration : IGrainServiceConfiguration
     {
-        private IDictionary<string, string> properties;
-
-        public string Name { get; set; }
-        public string ClientType { get; set; }
         public string ServiceType { get; set; }
 
         public GrainServiceConfiguration() {}
 
-        public GrainServiceConfiguration(IDictionary<string, string> properties, string serviceName, string clientType, string serviceType)
+        public GrainServiceConfiguration(string serviceType)
         {
-            this.properties = properties;
-            Name = serviceName;
-            ClientType = clientType;
             ServiceType = serviceType;
         }
 
@@ -78,26 +67,12 @@ namespace Orleans.Runtime.Configuration
                 nsManager = new XmlNamespaceManager(new NameTable());
                 nsManager.AddNamespace("orleans", "urn:orleans");
             }
-
-            if (child.HasAttribute("Name"))
-            {
-                Name = child.GetAttribute("Name");
-            }
-
-            if (alreadyLoaded != null && alreadyLoaded.ContainsKey(Name))
+            
+            if (alreadyLoaded != null && alreadyLoaded.ContainsKey(ServiceType))
             {
                 return;
             }
-
-            if (child.HasAttribute("ClientType"))
-            {
-                ClientType = child.GetAttribute("ClientType");
-            }
-            else
-            {
-                throw new FormatException("Missing 'ClientType' attribute on 'GrainService' element");
-            }
-
+            
             if (child.HasAttribute("ServiceType"))
             {
                 ServiceType = child.GetAttribute("ServiceType");
@@ -105,22 +80,6 @@ namespace Orleans.Runtime.Configuration
             else
             {
                 throw new FormatException("Missing 'ServiceType' attribute on 'GrainService' element");
-            }
-
-            if (String.IsNullOrEmpty(Name))
-            {
-                Name = ServiceType;
-            }
-
-            properties = new Dictionary<string, string>();
-            for (int i = 0; i < child.Attributes.Count; i++)
-            {
-                var key = child.Attributes[i].LocalName;
-                var val = child.Attributes[i].Value;
-                if ((key != "Type") && (key != "Name"))
-                {
-                    properties[key] = val;
-                }
             }
         }
         

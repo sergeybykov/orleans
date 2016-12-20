@@ -1114,9 +1114,9 @@ namespace Orleans.Runtime.Configuration
             return ProviderConfigurationUtility.GetAllProviderConfigurations(ProviderConfigurations);
         }
 
-        public void RegisterGrainService(string serviceName, string clientType, string serviceType, IDictionary<string, string> properties = null)
+        public void RegisterGrainService(string serviceType)
         {
-            GrainServiceConfigurationsUtility.RegisterGrainService(GrainServiceConfigurations, serviceName, clientType, serviceType, properties);
+            GrainServiceConfigurationsUtility.RegisterGrainService(GrainServiceConfigurations, serviceType);
         }
     }
 }
