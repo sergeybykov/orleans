@@ -3070,7 +3070,7 @@
       "output": {
         ".html": {
           "relative_path": "Documentation/toc.html",
-          "hash": "O0r7EFQTkzUkWBRAFXLUTg=="
+          "hash": "4sP6EN/xdeXK9qwYPw5ErA=="
         }
       },
       "is_incremental": false,
@@ -3605,12 +3605,246 @@
       "version": ""
     },
     {
+      "type": "Conceptual",
+      "source_relative_path": "blog/announcing-orleans-2.0-tech-preview-3.md",
+      "output": {
+        ".html": {
+          "relative_path": "Blog/announcing-orleans-2.0-tech-preview-3.html",
+          "hash": "WkBEpuL8EOJRihZVAmLFWQ=="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "Conceptual",
+      "source_relative_path": "blog/announcing-orleans-2.1.md",
+      "output": {
+        ".html": {
+          "relative_path": "Blog/announcing-orleans-2.1.html",
+          "hash": "9h9qr188uNDOgJF0PJgL6Q=="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "Conceptual",
+      "source_relative_path": "blog/de-inventing-the-wheel.md",
+      "output": {
+        ".html": {
+          "relative_path": "Blog/de-inventing-the-wheel.html",
+          "hash": "i6PvG5McqFMpgnMCYQNv0Q=="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "Conceptual",
+      "source_relative_path": "blog/dmitry-vakulenko.md",
+      "output": {
+        ".html": {
+          "relative_path": "Blog/dmitry-vakulenko.html",
+          "hash": "xL+9gxUx2AxFqNqJnENuig=="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "Conceptual",
+      "source_relative_path": "blog/fix-visual-studio-2015-with-orleans-tools-for-visual-studio-1.4.0 installed.md",
+      "output": {
+        ".html": {
+          "relative_path": "Blog/fix-visual-studio-2015-with-orleans-tools-for-visual-studio-1.4.0 installed.html",
+          "hash": "XHBYiLUM1JXWuVCkU/0qqA=="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "Conceptual",
+      "source_relative_path": "blog/index.md",
+      "output": {
+        ".html": {
+          "relative_path": "Blog/index.html",
+          "hash": "T7hBCa2cyDv9koQgwXDWJw=="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "Conceptual",
+      "source_relative_path": "blog/latest-release-1.3.1.md",
+      "output": {
+        ".html": {
+          "relative_path": "Blog/latest-release-1.3.1.html",
+          "hash": "e69EUZXU4R8a424O4tk79A=="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "Resource",
+      "source_relative_path": "blog/media/2016/12/linux-orleans-small-1024x576.png",
+      "output": {
+        "resource": {
+          "relative_path": "blog/media/2016/12/linux-orleans-small-1024x576.png"
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "Resource",
+      "source_relative_path": "blog/media/2017/03/vsix-error-dialog-300x148.jpg",
+      "output": {
+        "resource": {
+          "relative_path": "blog/media/2017/03/vsix-error-dialog-300x148.jpg"
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "Resource",
+      "source_relative_path": "blog/media/2017/04/reinvent-the-wheel.jpg",
+      "output": {
+        "resource": {
+          "relative_path": "blog/media/2017/04/reinvent-the-wheel.jpg"
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "Resource",
+      "source_relative_path": "blog/media/2018/11/Dmitry-217x300.png",
+      "output": {
+        "resource": {
+          "relative_path": "blog/media/2018/11/Dmitry-217x300.png"
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "Resource",
+      "source_relative_path": "blog/media/2018/12/lock_contention2.png",
+      "output": {
+        "resource": {
+          "relative_path": "blog/media/2018/12/lock_contention2.png"
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "Resource",
+      "source_relative_path": "blog/media/2018/12/lock_contention_small.png",
+      "output": {
+        "resource": {
+          "relative_path": "blog/media/2018/12/lock_contention_small.png"
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "Conceptual",
+      "source_relative_path": "blog/orleans-1.4-and-2.0-tech-preview-2-for-.net-core-released.md",
+      "output": {
+        ".html": {
+          "relative_path": "Blog/orleans-1.4-and-2.0-tech-preview-2-for-.net-core-released.html",
+          "hash": "FrVDujaOVzFnx5B/8JrR0Q=="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "Conceptual",
+      "source_relative_path": "blog/orleans-2.0-tech-preview-supporting-.net-core.md",
+      "output": {
+        ".html": {
+          "relative_path": "Blog/orleans-2.0-tech-preview-supporting-.net-core.html",
+          "hash": "+D/Fla1twN0/W9eF7wOSUg=="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "Conceptual",
+      "source_relative_path": "blog/orleans-and-midori.md",
+      "output": {
+        ".html": {
+          "relative_path": "Blog/orleans-and-midori.html",
+          "hash": "ExV6RYRsiGVnKoDnLW/sMw=="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "Conceptual",
+      "source_relative_path": "blog/refresh-of-orleans-2.0-tech-preview-with-orleanssqlutils-added.md",
+      "output": {
+        ".html": {
+          "relative_path": "Blog/refresh-of-orleans-2.0-tech-preview-with-orleanssqlutils-added.html",
+          "hash": "DRCNzukeWsV2dimW2WQkkg=="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "Conceptual",
+      "source_relative_path": "blog/solving-a-transactions-performance-mystery.md",
+      "output": {
+        ".html": {
+          "relative_path": "Blog/solving-a-transactions-performance-mystery.html",
+          "hash": "A9SRLAff5NlfXzkvlhVBdQ=="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "Toc",
+      "source_relative_path": "blog/toc.yml",
+      "output": {
+        ".html": {
+          "relative_path": "blog/toc.html",
+          "hash": "TX2b2M0trZsHvFz3jrcSog=="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "Conceptual",
+      "source_relative_path": "blog/welcome-to-orleans-blog.md",
+      "output": {
+        ".html": {
+          "relative_path": "Blog/welcome-to-orleans-blog.html",
+          "hash": "JR4pv/ughkR+bbwKJab5cQ=="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
       "type": "index",
       "source_relative_path": "index.md",
       "output": {
         ".html": {
           "relative_path": "index.html",
-          "hash": "66BYhXTesL0AApVhRMLadQ=="
+          "hash": "K+uZHC6qnhxwcX23cBqQSQ=="
         }
       },
       "is_incremental": false,
@@ -3632,8 +3866,7 @@
   "incremental_info": [
     {
       "status": {
-        "can_incremental": false,
-        "details": "Cannot build incrementally because last build info is missing.",
+        "can_incremental": true,
         "incrementalPhase": "build"
       },
       "processors": {
@@ -3642,13 +3875,13 @@
           "details": "Processor TocDocumentProcessor cannot support incremental build because the processor doesn't implement ISupportIncrementalDocumentProcessor interface.",
           "incrementalPhase": "build"
         },
+        "ConceptualDocumentProcessor": {
+          "can_incremental": true,
+          "incrementalPhase": "build"
+        },
         "ResourceDocumentProcessor": {
           "can_incremental": false,
           "details": "Processor ResourceDocumentProcessor cannot support incremental build because the processor doesn't implement ISupportIncrementalDocumentProcessor interface.",
-          "incrementalPhase": "build"
-        },
-        "ConceptualDocumentProcessor": {
-          "can_incremental": false,
           "incrementalPhase": "build"
         }
       }
