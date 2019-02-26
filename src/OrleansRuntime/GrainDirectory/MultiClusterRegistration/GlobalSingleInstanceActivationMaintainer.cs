@@ -190,7 +190,7 @@ namespace Orleans.Runtime.GrainDirectory
             var entriesBySilo = new Dictionary<SiloAddress, List<KeyValuePair<GrainId, IGrainInfo>>>();
 
             if(logger.IsVerbose)
-                logger.Verbose("GSIP:M validating {count} cache entries", cachedEntries.Count);
+                logger.Verbose("GSIP:M validating {0} cache entries", cachedEntries.Count);
 
             foreach (var entry in cachedEntries)
             {
@@ -246,7 +246,7 @@ namespace Orleans.Runtime.GrainDirectory
             if (clusterId == null || !multiClusterConfig.Clusters.Contains(clusterId))
             {
                 if(logger.IsVerbose)
-                    logger.Verbose("GSIP:M removing {Count} cache entries pointing to {Silo}", list.Count, silo);
+                    logger.Verbose("GSIP:M removing {0} cache entries pointing to {1}", list.Count, silo);
 
                 var registrar = this.registrarManager.GetRegistrar(GlobalSingleInstanceRegistration.Singleton);
 
