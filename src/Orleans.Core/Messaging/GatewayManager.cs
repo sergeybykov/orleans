@@ -1,11 +1,14 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using Orleans.Configuration;
 using Orleans.Runtime;
+using Orleans.Runtime.Messaging;
 
 namespace Orleans.Messaging
 {
@@ -26,23 +29,24 @@ namespace Orleans.Messaging
         private readonly SafeRandom rand;
         private readonly ILogger logger;
         private readonly ILoggerFactory loggerFactory;
+        private readonly ConnectionManager connectionManager;
         private readonly object lockable;
-        private readonly ClientMessageCenter messageCenter;
+
         private readonly GatewayOptions gatewayOptions;
         private bool gatewayRefreshCallInitiated;
 
         public GatewayManager(
-            ClientMessageCenter messageCenter,
-            GatewayOptions gatewayOptions,
+            IOptions<GatewayOptions> gatewayOptions,
             IGatewayListProvider gatewayListProvider,
-            ILoggerFactory loggerFactory)
+            ILoggerFactory loggerFactory,
+            ConnectionManager connectionManager)
         {
-            this.messageCenter = messageCenter;
-            this.gatewayOptions = gatewayOptions;
+            this.gatewayOptions = gatewayOptions.Value;
             knownDead = new Dictionary<Uri, DateTime>();
             rand = new SafeRandom();
             logger = loggerFactory.CreateLogger<GatewayManager>();
             this.loggerFactory = loggerFactory;
+            this.connectionManager = connectionManager;
             lockable = new object();
             gatewayRefreshCallInitiated = false;
 
@@ -278,15 +282,39 @@ namespace Orleans.Messaging
                             Utils.EnumerableToString(cachedLiveGateways),
                             prevRefresh);
                 }
+
+                this.AbortEvictedGatewayConnections(live);
+            }
+        }
+
+        private void AbortEvictedGatewayConnections(IList<Uri> liveGateways)
+        {
+            if (this.connectionManager == null) return;
+
+            var liveGatewayEndpoints = new HashSet<SiloAddress>();
+            foreach (var endpoint in liveGateways)
+            {
+                liveGatewayEndpoints.Add(endpoint.ToSiloAddress());
             }
 
-            this.messageCenter?.CleanupGatewayConnections(cachedLiveGateways);
+            var connectedGateways = this.connectionManager.GetConnectedAddresses();
+            foreach (var address in connectedGateways)
+            {
+                if (!liveGatewayEndpoints.Contains(address))
+                {
+                    if (logger.IsEnabled(LogLevel.Information))
+                    {
+                        this.logger.LogInformation("Aborting connection to {Endpoint} because it has been marked as dead", address);
+                    }
+
+                    this.connectionManager.Abort(address);
+                }
+            }
         }
 
         public void Dispose()
         {
-            var timer = gatewayRefreshTimer;
-            if (timer != null) timer.Dispose();
+            this.gatewayRefreshTimer?.Dispose();
         }
     }
 }

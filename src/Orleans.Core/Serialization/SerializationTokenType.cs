@@ -50,6 +50,9 @@ namespace Orleans.Serialization
         NamedType = 98,     // Followed by the type name as a string
         ExpectedType = 99,  // Indicates that the type can be deduced and is what can be deduced
         KeyedSerializer = 100, // Followed by a byte identifying which serializer is being used.
+#if SERIALIZER_SESSIONAWARE
+        ReferencedType = 101,  // Followed by a ushort identifying which previously specified type is being referred to
+#endif
 
         // Generic types and collections
         Tuple = 200,        // Add the count of items to this, followed by that many generic types, then the items

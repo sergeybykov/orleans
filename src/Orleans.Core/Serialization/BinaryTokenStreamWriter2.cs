@@ -16,7 +16,7 @@ namespace Orleans.Serialization
     /// <summary>
     /// Writer for Orleans binary token streams
     /// </summary>
-    public sealed class BinaryTokenStreamWriter2<TBufferWriter> : IBinaryTokenStreamWriter where TBufferWriter : IBufferWriter<byte>
+    internal sealed class BinaryTokenStreamWriter2<TBufferWriter> : IBinaryTokenStreamWriter where TBufferWriter : IBufferWriter<byte>
     {
         private static readonly Dictionary<Type, SerializationTokenType> typeTokens;
         private static readonly Dictionary<Type, Action<BinaryTokenStreamWriter2<TBufferWriter>, object>> writers;
