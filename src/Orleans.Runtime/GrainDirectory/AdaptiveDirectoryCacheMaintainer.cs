@@ -41,6 +41,8 @@ namespace Orleans.Runtime.GrainDirectory
         {
             while (router.Running)
             {
+                var membershipSnapshot = router.DirectoryMembershipSnapshot;
+
                 // Run through all cache entries and do the following:
                 // 1. If the entry is not expired, skip it
                 // 2. If the entry is expired and was not accessed in the last time interval -- throw it away
@@ -68,7 +70,7 @@ namespace Orleans.Runtime.GrainDirectory
                     GrainId grain = pair.Key;
                     var entry = pair.Value;
 
-                    SiloAddress owner = router.CalculateGrainDirectoryPartition(grain);
+                    SiloAddress owner = membershipSnapshot.CalculateGrainDirectoryPartition(grain);
                     if (owner == null) // Null means there's no other silo and we're shutting down, so skip this entry
                     {
                         continue;

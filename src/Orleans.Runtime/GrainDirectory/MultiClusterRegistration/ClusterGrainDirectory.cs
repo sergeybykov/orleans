@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Linq;
 using System.Threading.Tasks;
 using Orleans.GrainDirectory;
@@ -35,12 +35,14 @@ namespace Orleans.Runtime.GrainDirectory
             this.router = r;
             this.clusterId = clusterId;
             this.grainFactory = grainFactory;
-            this.logger = r.Logger;
+            this.logger = loggerFactory.CreateLogger<ClusterGrainDirectory>();
             this.multiClusterOracle = multiClusterOracle;
         }
 
         public async Task<RemoteClusterActivationResponse> ProcessActivationRequest(GrainId grain, string requestClusterId, int hopCount = 0)
         {
+            var callerMembershipVersion = default(MembershipVersion);
+
             // check if the requesting cluster id is in the current configuration view of this cluster
             // if not, reject the message.
             var multiClusterConfiguration = this.multiClusterOracle?.GetMultiClusterConfiguration();
@@ -52,24 +54,17 @@ namespace Orleans.Runtime.GrainDirectory
                 return new RemoteClusterActivationResponse(ActivationResponseStatus.Failed);
             }
 
-            var forwardAddress = router.CheckIfShouldForward(grain, 0, "ProcessActivationRequest");
+            var owner = await router.GetPartitionOwner(grain, hopCount, callerMembershipVersion, "ProcessActivationRequest");
 
-            // on all silos other than first, we insert a retry delay and recheck owner before forwarding
-            if (hopCount > 0 && forwardAddress != null)
-            {
-                await Task.Delay(LocalGrainDirectory.RETRY_DELAY);
-                forwardAddress = router.CheckIfShouldForward(grain, hopCount, "ProcessActivationRequest(recheck)");
-            }
-
-            if (forwardAddress == null)
+            if (this.Silo.Equals(owner))
             {
                 return ProcessRequestLocal(grain, requestClusterId);
             }
             else
             {
-                if (logger.IsEnabled(LogLevel.Trace)) logger.Trace("GSIP:Rsp {0} Origin={1} forward to {2}", grain.ToString(), requestClusterId, forwardAddress);
+                if (logger.IsEnabled(LogLevel.Trace)) logger.Trace("GSIP:Rsp {0} Origin={1} forward to {2}", grain.ToString(), requestClusterId, owner);
 
-                var clusterGrainDir = this.grainFactory.GetSystemTarget<IClusterGrainDirectory>(Constants.ClusterDirectoryServiceId, forwardAddress);
+                var clusterGrainDir = this.grainFactory.GetSystemTarget<IClusterGrainDirectory>(Constants.ClusterDirectoryServiceId, owner);
                 return await clusterGrainDir.ProcessActivationRequest(grain, requestClusterId, hopCount + 1);
             }
         }
