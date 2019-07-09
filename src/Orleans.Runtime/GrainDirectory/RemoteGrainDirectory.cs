@@ -103,7 +103,7 @@ namespace Orleans.Runtime.GrainDirectory
 
         public Task RemoveHandoffPartition(SiloAddress source)
         {
-            router.HandoffManager.RemoveHandoffPartition(source);
+            // No-op
             return Task.CompletedTask;
         }
 
