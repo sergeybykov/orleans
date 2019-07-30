@@ -1,13 +1,12 @@
 using System;
 using System.Threading;
-using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Orleans.Threading;
 using ExecutionContext = Orleans.Threading.ExecutionContext;
 
 namespace Orleans.Runtime.Scheduler
 {
-    internal class OrleansSchedulerAsynchAgent : AsynchQueueAgent<IWorkItem>
+    internal class OrleansSchedulerAsynchAgent : AsynchQueueAgent<IWorkItem>, ITaskSchedulerAgent
     {
         private readonly ThreadPoolExecutorOptions.BuilderConfigurator configureExecutorOptionsBuilder;
         

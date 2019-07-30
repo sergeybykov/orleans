@@ -49,6 +49,7 @@ namespace Orleans.Hosting
         {
             services.AddOptions();
 
+            services.AddSingleton<ITaskSchedulerAgentFactory, DotNetThreadPoolTaskSchedulerAgentFactory>();
             services.AddTransient<IConfigurationValidator, EndpointOptionsValidator>();
 
             // Options logging

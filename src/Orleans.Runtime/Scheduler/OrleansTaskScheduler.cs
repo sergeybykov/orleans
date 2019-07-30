@@ -3,16 +3,96 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Orleans.Configuration;
-using Orleans.Statistics;
 
 namespace Orleans.Runtime.Scheduler
 {
+    internal interface ITaskSchedulerAgent : IHealthCheckable
+    {
+        void Start();
+        void Stop();
+        void QueueRequest(IWorkItem request);
+        int Count { get; }
+    }
+
+    internal interface ITaskSchedulerAgentFactory
+    {
+        ITaskSchedulerAgent CreateSchedulerAsynchAgent(string agentName, bool drainAfterCancel, int degreeOfParallelism);
+    }
+
+    internal class DedicatedThreadPoolAgentFactory : ITaskSchedulerAgentFactory
+    {
+        private readonly ExecutorService executorService;
+        private readonly ILoggerFactory loggerFactory;
+        private readonly SchedulingOptions options;
+
+        public DedicatedThreadPoolAgentFactory(ExecutorService executorService, ILoggerFactory loggerFactory, IOptions<SchedulingOptions> options)
+        {
+            this.options = options.Value;
+            this.executorService = executorService;
+            this.loggerFactory = loggerFactory;
+        }
+
+        public ITaskSchedulerAgent CreateSchedulerAsynchAgent(string agentName, bool drainAfterCancel, int degreeOfParallelism)
+        {
+            return new OrleansSchedulerAsynchAgent(
+                agentName,
+                executorService,
+                degreeOfParallelism,
+                options.DelayWarningThreshold,
+                options.TurnWarningLengthThreshold,
+                drainAfterCancel,
+                loggerFactory);
+        }
+    }
+
+    internal class SharedThreadPoolTaskSchedulerAgent : ITaskSchedulerAgent
+    {
+        private static readonly WaitCallback WaitCallback = state =>
+        {
+            var request = (IWorkItem)state;
+            RuntimeContext.InitializeThread();
+            try
+            {
+                RuntimeContext.SetExecutionContext(request.SchedulingContext);
+                request.Execute();
+            }
+            finally
+            {
+                RuntimeContext.ResetExecutionContext();
+            }
+        };
+
+        public int Count => 0;
+
+        public bool CheckHealth(DateTime lastCheckTime) => true;
+
+        public void QueueRequest(IWorkItem request)
+        {
+            ThreadPool.UnsafeQueueUserWorkItem(WaitCallback, request);
+        }
+
+        public void Start() { }
+
+        public void Stop() { }
+    }
+
+    internal class DotNetThreadPoolTaskSchedulerAgentFactory : ITaskSchedulerAgentFactory
+    {
+        private readonly SharedThreadPoolTaskSchedulerAgent agent = new SharedThreadPoolTaskSchedulerAgent();
+
+        public ITaskSchedulerAgent CreateSchedulerAsynchAgent(string agentName, bool drainAfterCancel, int degreeOfParallelism)
+        {
+            return this.agent;
+        }
+    }
+
     [DebuggerDisplay("OrleansTaskScheduler RunQueueLength={" + nameof(RunQueueLength) + "}")]
     internal class OrleansTaskScheduler : TaskScheduler, ITaskScheduler, IHealthCheckParticipant
     {
@@ -26,8 +106,8 @@ namespace Orleans.Runtime.Scheduler
 
         private readonly CancellationTokenSource cancellationTokenSource;
 
-        private readonly OrleansSchedulerAsynchAgent systemAgent;
-        private readonly OrleansSchedulerAsynchAgent mainAgent;
+        private readonly ITaskSchedulerAgent systemAgent;
+        private readonly ITaskSchedulerAgent mainAgent;
 
         private readonly int maximumConcurrencyLevel;
 
@@ -43,7 +123,8 @@ namespace Orleans.Runtime.Scheduler
             ExecutorService executorService,
             ILoggerFactory loggerFactory,
             SchedulerStatisticsGroup schedulerStatistics,
-            IOptions<StatisticsOptions> statisticsOptions)
+            IOptions<StatisticsOptions> statisticsOptions,
+            ITaskSchedulerAgentFactory agentFactory)
         {
             this.loggerFactory = loggerFactory;
             this.schedulerStatistics = schedulerStatistics;
@@ -60,21 +141,9 @@ namespace Orleans.Runtime.Scheduler
             const int maxSystemThreads = 2;
             var maxActiveThreads = options.Value.MaxActiveThreads;
             maximumConcurrencyLevel = maxActiveThreads + maxSystemThreads;
-
-            OrleansSchedulerAsynchAgent CreateSchedulerAsynchAgent(string agentName, bool drainAfterCancel, int degreeOfParallelism)
-            {
-                return new OrleansSchedulerAsynchAgent(
-                    agentName,
-                    executorService,
-                    degreeOfParallelism,
-                    options.Value.DelayWarningThreshold,
-                    options.Value.TurnWarningLengthThreshold,
-                    drainAfterCancel,
-                    loggerFactory);
-            }
-
-            mainAgent = CreateSchedulerAsynchAgent("Scheduler.LevelOne.MainQueue", false, maxActiveThreads);
-            systemAgent = CreateSchedulerAsynchAgent("Scheduler.LevelOne.SystemQueue", true, maxSystemThreads);
+            
+            mainAgent = agentFactory.CreateSchedulerAsynchAgent("Scheduler.LevelOne.MainQueue", false, maxActiveThreads);
+            systemAgent = agentFactory.CreateSchedulerAsynchAgent("Scheduler.LevelOne.SystemQueue", true, maxSystemThreads);
 
             this.taskWorkItemLogger = loggerFactory.CreateLogger<TaskWorkItem>();
             logger.Info("Starting OrleansTaskScheduler with {0} Max Active application Threads and 2 system thread.", maxActiveThreads);
