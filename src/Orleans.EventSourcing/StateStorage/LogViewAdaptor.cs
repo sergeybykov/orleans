@@ -28,20 +28,27 @@ namespace Orleans.EventSourcing.StateStorage
         /// <summary>
         /// Initialize a StorageProviderLogViewAdaptor class
         /// </summary>
-        public LogViewAdaptor(ILogViewAdaptorHost<TLogView, TLogEntry> host, TLogView initialState, IGrainStorage globalGrainStorage, string grainTypeName, ILogConsistencyProtocolServices services)
+        public LogViewAdaptor(
+            ILogViewAdaptorHost<TLogView, TLogEntry> host,
+            TLogView initialState,
+            IGrainStorage globalGrainStorage,
+            string grainTypeName,
+            ILogConsistencyProtocolServices services,
+            ILocalSiloDetails localSiloDetails)
             : base(host, initialState, services)
         {
             this.globalGrainStorage = globalGrainStorage;
             this.grainTypeName = grainTypeName;
+            this.localSiloDetails = localSiloDetails;
         }
 
 
         private const int maxEntriesInNotifications = 200;
-
-
-        IGrainStorage globalGrainStorage;
-        string grainTypeName;        // stores the confirmed state including metadata
-        GrainStateWithMetaDataAndETag<TLogView> GlobalStateCache;
+        
+        private IGrainStorage globalGrainStorage;
+        private string grainTypeName;        // stores the confirmed state including metadata
+        private GrainStateWithMetaDataAndETag<TLogView> GlobalStateCache;
+        private ILocalSiloDetails localSiloDetails;
 
         /// <inheritdoc/>
         protected override TLogView LastConfirmedView()
@@ -120,7 +127,7 @@ namespace Orleans.EventSourcing.StateStorage
             nextglobalstate.StateAndMetaData.GlobalVersion = GlobalStateCache.StateAndMetaData.GlobalVersion + updates.Length;
             nextglobalstate.ETag = GlobalStateCache.ETag;
 
-            var writebit = nextglobalstate.StateAndMetaData.FlipBit(Services.MyClusterId);
+            var writebit = nextglobalstate.StateAndMetaData.FlipBit(localSiloDetails.ClusterId);
 
             try
             {
@@ -171,7 +178,7 @@ namespace Orleans.EventSourcing.StateStorage
 
                 // check if last apparently failed write was in fact successful
 
-                if (writebit == GlobalStateCache.StateAndMetaData.GetBit(Services.MyClusterId))
+                if (writebit == GlobalStateCache.StateAndMetaData.GetBit(localSiloDetails.ClusterId))
                 {
                     GlobalStateCache = nextglobalstate;
 

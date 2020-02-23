@@ -280,8 +280,7 @@ namespace Orleans.EventSourcing.Common
         /// <inheritdoc />
         public void Submit(TLogEntry logEntry)
         {
-            if (!SupportSubmissions)
-                throw new InvalidOperationException("provider does not support submissions on cluster " + Services.MyClusterId);
+            CheckSupportSubmissionsAndThrow();
 
             if (stats != null) stats.EventCounters["SubmitCalled"]++;
 
@@ -295,8 +294,7 @@ namespace Orleans.EventSourcing.Common
         /// <inheritdoc />
         public void SubmitRange(IEnumerable<TLogEntry> logEntries)
         {
-            if (!SupportSubmissions)
-                throw new InvalidOperationException("Provider does not support submissions on cluster " + Services.MyClusterId);
+            CheckSupportSubmissionsAndThrow();
 
             if (stats != null) stats.EventCounters["SubmitRangeCalled"]++;
 
@@ -313,8 +311,7 @@ namespace Orleans.EventSourcing.Common
         /// <inheritdoc />
         public Task<bool> TryAppend(TLogEntry logEntry)
         {
-            if (!SupportSubmissions)
-                throw new InvalidOperationException("Provider does not support submissions on cluster " + Services.MyClusterId);
+            CheckSupportSubmissionsAndThrow();
 
             if (stats != null) stats.EventCounters["TryAppendCalled"]++;
 
@@ -332,8 +329,7 @@ namespace Orleans.EventSourcing.Common
         /// <inheritdoc />
         public Task<bool> TryAppendRange(IEnumerable<TLogEntry> logEntries)
         {
-            if (!SupportSubmissions)
-                throw new InvalidOperationException("Provider does not support submissions on cluster " + Services.MyClusterId);
+            CheckSupportSubmissionsAndThrow();
 
             if (stats != null) stats.EventCounters["TryAppendRangeCalled"]++;
 
@@ -753,6 +749,12 @@ namespace Orleans.EventSourcing.Common
                     Services.CaughtUserCodeException("OnViewChanged", nameof(RemoveStaleConditionalUpdates), e);
                 }
             }
+        }
+
+        private void CheckSupportSubmissionsAndThrow()
+        {
+            if (!SupportSubmissions)
+                throw new InvalidOperationException("Provider does not support submissions");
         }
     }
 

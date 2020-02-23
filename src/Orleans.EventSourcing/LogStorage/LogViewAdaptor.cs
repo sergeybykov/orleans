@@ -28,26 +28,33 @@ namespace Orleans.EventSourcing.LogStorage
         /// <summary>
         /// Initialize a StorageProviderLogViewAdaptor class
         /// </summary>
-        public LogViewAdaptor(ILogViewAdaptorHost<TLogView, TLogEntry> host, TLogView initialState, IGrainStorage globalGrainStorage, string grainTypeName, ILogConsistencyProtocolServices services)
+        public LogViewAdaptor(
+            ILogViewAdaptorHost<TLogView, TLogEntry> host,
+            TLogView initialState,
+            IGrainStorage globalGrainStorage,
+            string grainTypeName,
+            ILogConsistencyProtocolServices services,
+            ILocalSiloDetails localSiloDetails)
             : base(host, initialState, services)
         {
             this.globalGrainStorage = globalGrainStorage;
             this.grainTypeName = grainTypeName;
+            this.localSiloDetails = localSiloDetails;
         }
 
 
         private const int maxEntriesInNotifications = 200;
 
 
-        IGrainStorage globalGrainStorage;
-        string grainTypeName;   
-
+        private IGrainStorage globalGrainStorage;
+        private string grainTypeName;
+        
         // the object containing the entire log, as retrieved from / sent to storage
-        LogStateWithMetaDataAndETag<TLogEntry> GlobalLog;
+        private LogStateWithMetaDataAndETag<TLogEntry> GlobalLog;
 
         // the confirmed view
         TLogView ConfirmedViewInternal;
-        int ConfirmedVersionInternal;
+        private int ConfirmedVersionInternal;
 
         /// <inheritdoc/>
         protected override TLogView LastConfirmedView()
@@ -85,6 +92,7 @@ namespace Orleans.EventSourcing.LogStorage
             ConfirmedVersionInternal = GlobalLog.StateAndMetaData.GlobalVersion;
         }
 
+        private ILocalSiloDetails localSiloDetails;
 
         /// <inheritdoc/>
         public override Task<IReadOnlyList<TLogEntry>> RetrieveLogSegment(int fromVersion, int toVersion)
@@ -148,7 +156,7 @@ namespace Orleans.EventSourcing.LogStorage
             var updates = GetCurrentBatchOfUpdates();
             bool batchsuccessfullywritten = false;
 
-            var writebit = GlobalLog.StateAndMetaData.FlipBit(Services.MyClusterId);
+            var writebit = GlobalLog.StateAndMetaData.FlipBit(localSiloDetails.ClusterId);
             foreach (var x in updates)
                 GlobalLog.StateAndMetaData.Log.Add(x.Entry);
 
@@ -203,7 +211,7 @@ namespace Orleans.EventSourcing.LogStorage
 
                 // check if last apparently failed write was in fact successful
 
-                if (writebit == GlobalLog.StateAndMetaData.GetBit(Services.MyClusterId))
+                if (writebit == GlobalLog.StateAndMetaData.GetBit(localSiloDetails.ClusterId))
                 {
                     Services.Log(LogLevel.Debug, "last write ({0} updates) was actually a success {1}", updates.Length, GlobalLog);
 

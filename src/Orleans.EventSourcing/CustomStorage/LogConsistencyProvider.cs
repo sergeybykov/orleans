@@ -1,10 +1,10 @@
-
 using Orleans.LogConsistency;
 using Orleans.Storage;
 using Orleans.Configuration;
 using System;
 using Microsoft.Extensions.Options;
 using Microsoft.Extensions.DependencyInjection;
+using Orleans.Runtime;
 
 namespace Orleans.EventSourcing.CustomStorage
 {
@@ -35,7 +35,14 @@ namespace Orleans.EventSourcing.CustomStorage
         }
 
         /// <inheritdoc/>
-        public ILogViewAdaptor<TView, TEntry> MakeLogViewAdaptor<TView, TEntry>(ILogViewAdaptorHost<TView, TEntry> hostgrain, TView initialstate, string graintypename, IGrainStorage grainStorage, ILogConsistencyProtocolServices services)
+        public ILogViewAdaptor<TView, TEntry> MakeLogViewAdaptor<TView, TEntry>(
+            ILogViewAdaptorHost<TView, TEntry> hostgrain,
+            TView initialstate,
+            string graintypename,
+            IGrainStorage grainStorage,
+            ILogConsistencyProtocolServices services,
+            ILocalSiloDetails localSiloDetails)
+
             where TView : class, new()
             where TEntry : class
         {

@@ -1,4 +1,5 @@
-﻿
+
+using Orleans.Runtime;
 using Orleans.Storage;
 
 namespace Orleans.LogConsistency
@@ -19,7 +20,8 @@ namespace Orleans.LogConsistency
             TLogView initialstate,
             string graintypename,
             IGrainStorage grainStorage,
-            ILogConsistencyProtocolServices services)
+            ILogConsistencyProtocolServices services,
+            ILocalSiloDetails localSiloDetails)
 
             where TLogView : class, new()
             where TLogEntry : class;

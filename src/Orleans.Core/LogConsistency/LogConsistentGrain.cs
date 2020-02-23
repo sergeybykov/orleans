@@ -7,7 +7,6 @@ using Microsoft.Extensions.DependencyInjection;
 using Orleans.Core;
 using Orleans.Runtime;
 using Orleans.Storage;
-using Orleans.GrainDirectory;
 using Orleans.Providers;
 using Orleans.MultiCluster;
 

@@ -1,12 +1,6 @@
-﻿using Orleans.LogConsistency;
-using Orleans.Providers;
+using Orleans.LogConsistency;
 using Orleans.Runtime;
 using Orleans.Storage;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Orleans.EventSourcing.LogStorage
 {
@@ -20,11 +14,16 @@ namespace Orleans.EventSourcing.LogStorage
             }
         }
 
-         public ILogViewAdaptor<T, E> MakeLogViewAdaptor<T, E>(ILogViewAdaptorHost<T, E> hostgrain, T initialstate, string graintypename, IGrainStorage grainStorage, ILogConsistencyProtocolServices services)
+         public ILogViewAdaptor<T, E> MakeLogViewAdaptor<T, E>(
+             ILogViewAdaptorHost<T, E> hostgrain,
+             T initialstate, string graintypename,
+             IGrainStorage grainStorage,
+             ILogConsistencyProtocolServices services,
+             ILocalSiloDetails localSiloDetails)
+
             where T : class, new() where E : class
         {
-            return new LogViewAdaptor<T, E>(hostgrain, initialstate, grainStorage, graintypename, services);
+            return new LogViewAdaptor<T, E>(hostgrain, initialstate, grainStorage, graintypename, services, localSiloDetails);
         }
-
     }
 }

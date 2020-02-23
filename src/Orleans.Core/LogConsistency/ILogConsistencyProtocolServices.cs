@@ -29,12 +29,6 @@ namespace Orleans.LogConsistency
         SerializationManager SerializationManager { get; }
 
         /// <summary>
-        /// The id of this cluster. Returns "I" if no multi-cluster network is present.
-        /// </summary>
-        /// <returns></returns>
-        string MyClusterId { get; }
-
-        /// <summary>
         /// Log an error that occurred in a log-consistency protocol.
         /// </summary>
         void ProtocolError(string msg, bool throwexception);

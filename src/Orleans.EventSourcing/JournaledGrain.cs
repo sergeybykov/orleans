@@ -1,12 +1,12 @@
-using Orleans.Concurrency;
-using Orleans.MultiCluster;
-using Orleans.LogConsistency;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Microsoft.Extensions.DependencyInjection;
 using Orleans.Core;
 using Orleans.Runtime;
 using Orleans.Storage;
+using Orleans.LogConsistency;
+using Orleans.MultiCluster;
 
 namespace Orleans.EventSourcing
 {
@@ -281,10 +281,22 @@ namespace Orleans.EventSourcing
         /// Called right after grain is constructed, to install the adaptor.
         /// The log-consistency provider contains a factory method that constructs the adaptor with chosen types for this grain
         /// </summary>
-        protected override void InstallAdaptor(ILogViewAdaptorFactory factory, object initialState, string graintypename, IGrainStorage grainStorage, ILogConsistencyProtocolServices services)
+        protected override void InstallAdaptor(
+            ILogViewAdaptorFactory factory,
+            object initialState,
+            string graintypename,
+            IGrainStorage grainStorage,
+            ILogConsistencyProtocolServices services)
         {
+            var foo = this.ServiceProvider.GetService<ILocalSiloDetails>();
             // call the log consistency provider to construct the adaptor, passing the type argument
-            LogViewAdaptor = factory.MakeLogViewAdaptor<TGrainState, TEventBase>(this, (TGrainState)initialState, graintypename, grainStorage, services);
+            LogViewAdaptor = factory.MakeLogViewAdaptor<TGrainState, TEventBase>(
+                this,
+                (TGrainState)initialState,
+                graintypename,
+                grainStorage,
+                services,
+                this.ServiceProvider.GetService<ILocalSiloDetails>());
         }
 
         /// <summary>

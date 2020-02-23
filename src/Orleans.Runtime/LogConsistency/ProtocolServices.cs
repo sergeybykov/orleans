@@ -20,32 +20,24 @@ namespace Orleans.Runtime.LogConsistency
     /// </summary>
     internal class ProtocolServices : ILogConsistencyProtocolServices
     {
-        private static readonly object[] EmptyObjectArray = new object[0];
 
         private readonly ILogger log;
-        private readonly IInternalGrainFactory grainFactory;
         private readonly Grain grain;   // links to the grain that owns this service object
 
         public ProtocolServices(
             Grain gr,
             ILoggerFactory loggerFactory,
-            SerializationManager serializationManager,
-            IInternalGrainFactory grainFactory,
-            ILocalSiloDetails siloDetails)
+            SerializationManager serializationManager)
         {
             this.grain = gr;
             this.log = loggerFactory.CreateLogger<ProtocolServices>();
-            this.grainFactory = grainFactory;
             this.SerializationManager = serializationManager;
-            this.MyClusterId = siloDetails.ClusterId;
         }
         
         public GrainReference GrainReference => grain.GrainReference;
 
         /// <inheritdoc />
         public SerializationManager SerializationManager { get; }
-
-        public string MyClusterId { get; }
 
         public void ProtocolError(string msg, bool throwexception)
         {
@@ -58,7 +50,7 @@ namespace Orleans.Runtime.LogConsistency
             if (!throwexception)
                 return;
 
-            throw new OrleansException(string.Format("{0} (grain={1}, cluster={2})", msg, grain.GrainReference, this.MyClusterId));
+            throw new OrleansException($"{msg} (grain={grain.GrainReference})");
         }
 
         public void CaughtException(string where, Exception e)
