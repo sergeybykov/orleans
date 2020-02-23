@@ -7,6 +7,7 @@ using Orleans.Runtime;
 using Orleans.Storage;
 using Orleans.LogConsistency;
 using Orleans.MultiCluster;
+using Orleans.Serialization;
 
 namespace Orleans.EventSourcing
 {
@@ -288,7 +289,6 @@ namespace Orleans.EventSourcing
             IGrainStorage grainStorage,
             ILogConsistencyProtocolServices services)
         {
-            var foo = this.ServiceProvider.GetService<ILocalSiloDetails>();
             // call the log consistency provider to construct the adaptor, passing the type argument
             LogViewAdaptor = factory.MakeLogViewAdaptor<TGrainState, TEventBase>(
                 this,
@@ -296,7 +296,7 @@ namespace Orleans.EventSourcing
                 graintypename,
                 grainStorage,
                 services,
-                this.ServiceProvider.GetService<ILocalSiloDetails>());
+                this.ServiceProvider);
         }
 
         /// <summary>

@@ -24,19 +24,9 @@ namespace Orleans.LogConsistency
         GrainReference GrainReference { get;  }
 
         /// <summary>
-        /// The serialization manager.
-        /// </summary>
-        SerializationManager SerializationManager { get; }
-
-        /// <summary>
         /// Log an error that occurred in a log-consistency protocol.
         /// </summary>
         void ProtocolError(string msg, bool throwexception);
-
-        /// <summary>
-        /// Log an exception that was caught in the log-consistency protocol.
-        /// </summary> 
-        void CaughtException(string where, Exception e);
 
         /// <summary>
         /// Log an exception that occurred in user code, for some callback

@@ -1,6 +1,5 @@
-
+using System;
 using Orleans.LogConsistency;
-using Orleans.Runtime;
 using Orleans.Storage;
 
 
@@ -35,19 +34,19 @@ namespace Orleans.EventSourcing.LogStorage
         /// <param name="grainTypeName">The type name of the grain</param>
         /// <param name="grainStorage">Storage provider</param>
         /// <param name="services">Runtime services for multi-cluster coherence protocols</param>
-        /// <param name="localSiloDetails">Local silo details</param>
+        /// <param name="serviceProvider">Service provider</param>
         public ILogViewAdaptor<TView, TEntry> MakeLogViewAdaptor<TView, TEntry>(
             ILogViewAdaptorHost<TView, TEntry> hostGrain,
             TView initialState,
             string grainTypeName,
             IGrainStorage grainStorage,
             ILogConsistencyProtocolServices services,
-            ILocalSiloDetails localSiloDetails)
+            IServiceProvider serviceProvider)
 
             where TView : class, new()
             where TEntry : class
         {
-            return new LogViewAdaptor<TView,TEntry>(hostGrain, initialState, grainStorage, grainTypeName, services, localSiloDetails);
+            return new LogViewAdaptor<TView,TEntry>(hostGrain, initialState, grainStorage, grainTypeName, services, serviceProvider);
         }
     }
 }

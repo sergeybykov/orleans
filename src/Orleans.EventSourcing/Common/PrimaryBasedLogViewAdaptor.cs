@@ -1,15 +1,13 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
+using Microsoft.Extensions.DependencyInjection;
 using Orleans.LogConsistency;
 using System.Diagnostics;
 using Microsoft.Extensions.Logging;
 using Orleans.Serialization;
 using Orleans.MultiCluster;
-using Orleans.Runtime;
-using Orleans.GrainDirectory;
 
 namespace Orleans.EventSourcing.Common
 {
@@ -155,15 +153,21 @@ namespace Orleans.EventSourcing.Common
 
         private const int max_notification_batch_size = 10000;
 
+        private readonly SerializationManager serializationManager;
+
         /// <summary>
         /// Construct an instance, for the given parameters.
         /// </summary>
-        protected PrimaryBasedLogViewAdaptor(ILogViewAdaptorHost<TLogView, TLogEntry> host, 
-            TLogView initialstate, ILogConsistencyProtocolServices services)
+        protected PrimaryBasedLogViewAdaptor(
+            ILogViewAdaptorHost<TLogView, TLogEntry> host, 
+            TLogView initialstate,
+            ILogConsistencyProtocolServices services,
+            IServiceProvider serviceProvider)
         {
             Debug.Assert(host != null && services != null && initialstate != null);
             this.Host = host;
             this.Services = services;
+            this.serializationManager = serviceProvider.GetRequiredService<SerializationManager>();
             InitializeConfirmedView(initialstate);
             worker = new BatchWorkerFromDelegate(Work);
         }
@@ -501,7 +505,7 @@ namespace Orleans.EventSourcing.Common
         private void CalculateTentativeState()
         {
             // copy the master
-            this.tentativeStateInternal = (TLogView)Services.SerializationManager.DeepCopy(LastConfirmedView());
+            this.tentativeStateInternal = (TLogView)this.serializationManager.DeepCopy(LastConfirmedView());
 
             // Now apply all operations in pending 
             foreach (var u in this.pending)

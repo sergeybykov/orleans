@@ -2,15 +2,13 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
-using Orleans;
 using Orleans.LogConsistency;
-using Orleans.Runtime;
 using Orleans.Storage;
 using Orleans.MultiCluster;
 using Orleans.EventSourcing.Common;
+using Orleans.Serialization;
 
 namespace Orleans.EventSourcing.CustomStorage
 {
@@ -28,8 +26,8 @@ namespace Orleans.EventSourcing.CustomStorage
         /// Initialize a new instance of CustomStorageAdaptor class
         /// </summary>
         public CustomStorageAdaptor(ILogViewAdaptorHost<TLogView, TLogEntry> host, TLogView initialState,
-            ILogConsistencyProtocolServices services, string primaryCluster)
-            : base(host, initialState, services)
+            ILogConsistencyProtocolServices services, string primaryCluster, IServiceProvider serviceProvider)
+            : base(host, initialState, services, serviceProvider)
         {
             if (!(host is ICustomStorageInterface<TLogView, TLogEntry>))
                 throw new BadProviderConfigException("Must implement ICustomStorageInterface<TLogView,TLogEntry> for CustomStorageLogView provider");

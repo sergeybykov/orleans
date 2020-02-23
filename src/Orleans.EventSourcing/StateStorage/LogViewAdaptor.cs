@@ -2,10 +2,9 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
-using Orleans;
+using Microsoft.Extensions.DependencyInjection;
 using Orleans.LogConsistency;
 using Orleans.Storage;
 using Orleans.EventSourcing.Common;
@@ -34,12 +33,12 @@ namespace Orleans.EventSourcing.StateStorage
             IGrainStorage globalGrainStorage,
             string grainTypeName,
             ILogConsistencyProtocolServices services,
-            ILocalSiloDetails localSiloDetails)
-            : base(host, initialState, services)
+            IServiceProvider serviceProvider)
+            : base(host, initialState, services, serviceProvider)
         {
             this.globalGrainStorage = globalGrainStorage;
             this.grainTypeName = grainTypeName;
-            this.localSiloDetails = localSiloDetails;
+            this.localSiloDetails = serviceProvider.GetService<ILocalSiloDetails>();
         }
 
 

@@ -26,18 +26,13 @@ namespace Orleans.Runtime.LogConsistency
 
         public ProtocolServices(
             Grain gr,
-            ILoggerFactory loggerFactory,
-            SerializationManager serializationManager)
+            ILoggerFactory loggerFactory)
         {
             this.grain = gr;
             this.log = loggerFactory.CreateLogger<ProtocolServices>();
-            this.SerializationManager = serializationManager;
         }
         
         public GrainReference GrainReference => grain.GrainReference;
-
-        /// <inheritdoc />
-        public SerializationManager SerializationManager { get; }
 
         public void ProtocolError(string msg, bool throwexception)
         {
@@ -51,14 +46,6 @@ namespace Orleans.Runtime.LogConsistency
                 return;
 
             throw new OrleansException($"{msg} (grain={grain.GrainReference})");
-        }
-
-        public void CaughtException(string where, Exception e)
-        {
-            log?.Error((int)ErrorCode.LogConsistency_CaughtException,
-               string.Format("{0} Exception Caught at {1}",
-                   grain.GrainReference,
-                   where),e);
         }
 
         public void CaughtUserCodeException(string callback, string where, Exception e)

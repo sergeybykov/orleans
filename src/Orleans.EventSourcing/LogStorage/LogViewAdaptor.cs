@@ -2,10 +2,9 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
-using Orleans;
+using Microsoft.Extensions.DependencyInjection;
 using Orleans.LogConsistency;
 using Orleans.Storage;
 using Orleans.EventSourcing.Common;
@@ -34,12 +33,12 @@ namespace Orleans.EventSourcing.LogStorage
             IGrainStorage globalGrainStorage,
             string grainTypeName,
             ILogConsistencyProtocolServices services,
-            ILocalSiloDetails localSiloDetails)
-            : base(host, initialState, services)
+            IServiceProvider serviceProvider)
+            : base(host, initialState, services, serviceProvider)
         {
             this.globalGrainStorage = globalGrainStorage;
             this.grainTypeName = grainTypeName;
-            this.localSiloDetails = localSiloDetails;
+            this.clusterId = serviceProvider.GetService<ILocalSiloDetails>().ClusterId;
         }
 
 
@@ -92,7 +91,7 @@ namespace Orleans.EventSourcing.LogStorage
             ConfirmedVersionInternal = GlobalLog.StateAndMetaData.GlobalVersion;
         }
 
-        private ILocalSiloDetails localSiloDetails;
+        private string clusterId;
 
         /// <inheritdoc/>
         public override Task<IReadOnlyList<TLogEntry>> RetrieveLogSegment(int fromVersion, int toVersion)
@@ -156,7 +155,7 @@ namespace Orleans.EventSourcing.LogStorage
             var updates = GetCurrentBatchOfUpdates();
             bool batchsuccessfullywritten = false;
 
-            var writebit = GlobalLog.StateAndMetaData.FlipBit(localSiloDetails.ClusterId);
+            var writebit = GlobalLog.StateAndMetaData.FlipBit(this.clusterId);
             foreach (var x in updates)
                 GlobalLog.StateAndMetaData.Log.Add(x.Entry);
 
@@ -211,7 +210,7 @@ namespace Orleans.EventSourcing.LogStorage
 
                 // check if last apparently failed write was in fact successful
 
-                if (writebit == GlobalLog.StateAndMetaData.GetBit(localSiloDetails.ClusterId))
+                if (writebit == GlobalLog.StateAndMetaData.GetBit(this.clusterId))
                 {
                     Services.Log(LogLevel.Debug, "last write ({0} updates) was actually a success {1}", updates.Length, GlobalLog);
 

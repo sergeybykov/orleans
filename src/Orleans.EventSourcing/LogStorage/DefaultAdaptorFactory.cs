@@ -1,5 +1,8 @@
+using System;
+using Microsoft.Extensions.DependencyInjection;
 using Orleans.LogConsistency;
 using Orleans.Runtime;
+using Orleans.Serialization;
 using Orleans.Storage;
 
 namespace Orleans.EventSourcing.LogStorage
@@ -19,11 +22,17 @@ namespace Orleans.EventSourcing.LogStorage
              T initialstate, string graintypename,
              IGrainStorage grainStorage,
              ILogConsistencyProtocolServices services,
-             ILocalSiloDetails localSiloDetails)
+             IServiceProvider serviceProvider)
 
             where T : class, new() where E : class
         {
-            return new LogViewAdaptor<T, E>(hostgrain, initialstate, grainStorage, graintypename, services, localSiloDetails);
+            return new LogViewAdaptor<T, E>(
+                hostgrain,
+                initialstate,
+                grainStorage,
+                graintypename,
+                services,
+                serviceProvider);
         }
     }
 }

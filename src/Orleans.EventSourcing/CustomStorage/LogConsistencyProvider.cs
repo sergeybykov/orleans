@@ -4,7 +4,7 @@ using Orleans.Configuration;
 using System;
 using Microsoft.Extensions.Options;
 using Microsoft.Extensions.DependencyInjection;
-using Orleans.Runtime;
+using Orleans.Serialization;
 
 namespace Orleans.EventSourcing.CustomStorage
 {
@@ -41,12 +41,17 @@ namespace Orleans.EventSourcing.CustomStorage
             string graintypename,
             IGrainStorage grainStorage,
             ILogConsistencyProtocolServices services,
-            ILocalSiloDetails localSiloDetails)
+            IServiceProvider serviceProvider)
 
             where TView : class, new()
             where TEntry : class
         {
-            return new CustomStorageAdaptor<TView, TEntry>(hostgrain, initialstate, services, PrimaryCluster);
+            return new CustomStorageAdaptor<TView, TEntry>(
+                hostgrain,
+                initialstate,
+                services,
+                PrimaryCluster,
+                serviceProvider);
         }
     }
 
